@@ -1,1 +1,87 @@
-hello world
+#include <iostream>
+using namespace std;
+
+class RNA_class {
+private:
+	unsigned int size;
+	int* rna = nullptr;
+public:
+	RNA_class(unsigned int size_in) {
+		size = size_in;
+		if (size != 0) {
+			rna = new int[(size - 1) / (sizeof(int) / 4) + 1];
+			for (unsigned int i = 0; i < ((size - 1) / (sizeof(int) * 4) + 1); i++) {
+				rna[i] = 0;
+			}
+		}
+		else
+			rna = nullptr;
+	}
+	~RNA_class(){
+		delete rna;
+	}
+	int & operator[] (int int_n) {
+		return rna[int_n];
+	}
+	void RNA_ADD(string str) {
+		unsigned int i;
+		for (i = 0; i < ((size - 1) / (sizeof(int) * 4) + 1) * sizeof(int) * 4; i = i + 1) {
+			if (i < size) {
+				if (str[i] == 'A') { // 00
+					rna[i / (sizeof(int) * 4)] = rna[i / (sizeof(int) * 4)] | (0 << (2 * (i % (sizeof(int) * 4))));
+				}
+				else {
+					if (str[i] == 'G') { // 01
+						rna[i / (sizeof(int) * 4)] = rna[i / (sizeof(int) * 4)] | (1 << (2 * (i % (sizeof(int) * 4))));
+					}
+					else {
+						if (str[i] == 'C') { // 10
+							rna[i / (sizeof(int) * 4)] = rna[i / (sizeof(int) * 4)] | (2 << (2 * (i % (sizeof(int) * 4))));
+						}
+						else {
+							if (str[i] == 'T') { // 11
+								rna[i / (sizeof(int) * 4)] = rna[i / (sizeof(int) * 4)] | (3 << (2 * (i % (sizeof(int) * 4))));
+							}
+						}
+					}
+				}
+			}
+			else break;
+		}
+	}
+	void RNA_out() {
+		unsigned int i;
+		for (i = 0; i < ((size - 1) / (sizeof(int) / 4) + 1) * sizeof(int) * 4; i++) {
+			if (i < size) {
+				if (((rna[i / (sizeof(int) * 4)] >> (sizeof(int) * 8 + 2 * (i % (sizeof(int) * 4)))) & 3) == 0) { // 00
+					cout << 'A';
+				}
+				else {
+					if (((rna[i / (sizeof(int) * 4)] >> (sizeof(int) * 8 + 2 * (i % (sizeof(int) * 4)))) & 3) == 1) { // 01
+						cout << 'G';
+					}
+					else {
+						if (((rna[i / (sizeof(int) * 4)] >> (sizeof(int) * 8 + 2 * (i % (sizeof(int) * 4)))) & 3) == 2) { // 10
+							cout << 'C';
+						}
+						else {
+							if (((rna[i / (sizeof(int) * 4)] >> (sizeof(int) * 8 + 2 * (i % (sizeof(int) * 4)))) & 3) == 3) { // 11
+								cout << 'T';
+							}
+						}
+					}
+				}
+			}
+			else break;
+		}
+	}
+};
+
+int main() {
+	string rna_in;
+	cin >> rna_in;
+	RNA_class RNA(rna_in.length());
+	RNA.RNA_ADD(rna_in);
+	RNA.RNA_out();
+	return 0;
+}
