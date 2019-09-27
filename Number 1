@@ -6,7 +6,7 @@ private:
 	unsigned int size;
 	int* rna = nullptr;
 public:
-	RNA_class(unsigned int size_in) {
+	RNA_class(unsigned int size_in) {																						// Конструктор
 		size = size_in;
 		if (size != 0) {
 			rna = new int[(size - 1) / (sizeof(int) / 4) + 1];
@@ -17,71 +17,155 @@ public:
 		else
 			rna = nullptr;
 	}
-	~RNA_class(){
+	~RNA_class(){																											// Деструктор
 		delete rna;
+		rna = nullptr;
 	}
-	int & operator[] (int int_n) {
+	int & operator[] (int int_n) {																							// Перегрузка оператора []
 		return rna[int_n];
 	}
-	void RNA_ADD(string str) {
+	void RNA_ADD(string str) {																								// Записывает в объект данные из полученной строки
 		unsigned int i;
-		for (i = 0; i < ((size - 1) / (sizeof(int) * 4) + 1) * sizeof(int) * 4; i = i + 1) {
-			if (i < size) {
-				if (str[i] == 'A') { // 00
+		for (i = 0; i < size; i++) {
+			/*if (str[i] == 'A') {																							// 00 (Показательный if)
 					rna[i / (sizeof(int) * 4)] = rna[i / (sizeof(int) * 4)] | (0 << (2 * (i % (sizeof(int) * 4))));
 				}
+			else {*/
+				if (str[i] == 'G') {																						// 01
+					rna[i / (sizeof(int) * 4)] = rna[i / (sizeof(int) * 4)] | (1 << (2 * (i % (sizeof(int) * 4))));
+				}
 				else {
-					if (str[i] == 'G') { // 01
-						rna[i / (sizeof(int) * 4)] = rna[i / (sizeof(int) * 4)] | (1 << (2 * (i % (sizeof(int) * 4))));
+					if (str[i] == 'C') {																					// 10
+						rna[i / (sizeof(int) * 4)] = rna[i / (sizeof(int) * 4)] | (2 << (2 * (i % (sizeof(int) * 4))));
 					}
 					else {
-						if (str[i] == 'C') { // 10
-							rna[i / (sizeof(int) * 4)] = rna[i / (sizeof(int) * 4)] | (2 << (2 * (i % (sizeof(int) * 4))));
-						}
-						else {
-							if (str[i] == 'T') { // 11
-								rna[i / (sizeof(int) * 4)] = rna[i / (sizeof(int) * 4)] | (3 << (2 * (i % (sizeof(int) * 4))));
-							}
+						if (str[i] == 'T') {																				// 11
+							rna[i / (sizeof(int) * 4)] = rna[i / (sizeof(int) * 4)] | (3 << (2 * (i % (sizeof(int) * 4))));
 						}
 					}
 				}
-			}
-			else break;
+			
+			//}
 		}
 	}
-	void RNA_out() {
+	void RNA_out() {																										// Вывод объекта
 		unsigned int i;
-		for (i = 0; i < ((size - 1) / (sizeof(int) / 4) + 1) * sizeof(int) * 4; i++) {
-			if (i < size) {
-				if (((rna[i / (sizeof(int) * 4)] >> (sizeof(int) * 8 + 2 * (i % (sizeof(int) * 4)))) & 3) == 0) { // 00
-					cout << 'A';
+		for (i = 0; i < size; i++) {
+			if (((rna[i / (sizeof(int) * 4)] >> (sizeof(int) * 8 + 2 * (i % (sizeof(int) * 4)))) & 3) == 0) {				// 00
+				cout << 'A';
+			}
+			else {
+				if (((rna[i / (sizeof(int) * 4)] >> (sizeof(int) * 8 + 2 * (i % (sizeof(int) * 4)))) & 3) == 1) {			// 01
+					cout << 'G';
 				}
 				else {
-					if (((rna[i / (sizeof(int) * 4)] >> (sizeof(int) * 8 + 2 * (i % (sizeof(int) * 4)))) & 3) == 1) { // 01
-						cout << 'G';
+					if (((rna[i / (sizeof(int) * 4)] >> (sizeof(int) * 8 + 2 * (i % (sizeof(int) * 4)))) & 3) == 2) {		// 10
+						cout << 'C';
 					}
 					else {
-						if (((rna[i / (sizeof(int) * 4)] >> (sizeof(int) * 8 + 2 * (i % (sizeof(int) * 4)))) & 3) == 2) { // 10
-							cout << 'C';
-						}
-						else {
-							if (((rna[i / (sizeof(int) * 4)] >> (sizeof(int) * 8 + 2 * (i % (sizeof(int) * 4)))) & 3) == 3) { // 11
-								cout << 'T';
-							}
+						if (((rna[i / (sizeof(int) * 4)] >> (sizeof(int) * 8 + 2 * (i % (sizeof(int) * 4)))) & 3) == 3) {	// 11
+							cout << 'T';
 						}
 					}
 				}
 			}
-			else break;
 		}
+		cout << "\n";
+	}
+	unsigned int get_size() {																								// Размер РНК цепочки
+		return size;
+	}
+	bool operator== (const RNA_class & rna2) {																				// Перегрузка оператора ==
+		int i, error = 0;
+		if (size != rna2.size)
+			return 0;
+		else {
+			for (i = 0; i < (size - 1) / (sizeof(int) * 4) + 1; i++) {
+				if (rna[i] != rna2.rna[i]) {
+					error = 1;
+					break;
+				}
+			}
+			if (error == 1)
+				return 0;
+			else
+				return 1;
+		}
+	}
+	bool operator!= (const RNA_class& rna2) {																				// Перегрузка оператора !=
+		int i, error = 0;
+		if (size != rna2.size)
+			return 1;
+		else {
+			for (i = 0; i < (size - 1) / (sizeof(int) * 4) + 1; i++) {
+				if (rna[i] != rna2.rna[i]) {
+					error = 1;
+					break;
+				}
+			}
+			if (error == 1)
+				return 1;
+			else
+				return 0;
+		}
+	}
+	RNA_class operator+ (RNA_class& rna2) {																			// Перегрузка оператора +
+		//RNA_class RNA_SUM(size + rna2.size);
+		int* RNA_SUM = new int[(size + rna2.size - 1) / (sizeof(int) / 4) + 1];
+		for (unsigned int i = 0; i < ((size + rna2.size - 1) / (sizeof(int) * 4) + 1); i++) {
+			RNA_SUM[i] = 0;
+		}
+		unsigned int i, k;
+		for (i = 0; i < size; i++) {
+			RNA_SUM[i / (sizeof(int) * 4)] = RNA_SUM[i / (sizeof(int) * 4)] | (((rna[i / (sizeof(int) * 4)] >> (2 * (i % (sizeof(int) * 4)))) & 3) << (2 * (i % (sizeof(int) * 4))));
+		}
+		k = i;
+		for (i = size; i < size + rna2.size; i++) {
+			RNA_SUM[i / (sizeof(int) * 4)] = RNA_SUM[i / (sizeof(int) * 4)] | (((rna2.rna[(i - k) / (sizeof(int) * 4)] >> (2 * ((i - k) % (sizeof(int) * 4)))) & 3) << (2 * (i % (sizeof(int) * 4))));
+		}
+		//RNA_SUM.RNA_out();
+		size = size + rna2.size;
+		delete rna;
+		rna = RNA_SUM;
+		return *this;
 	}
 };
 
+bool RNA_chek(string RNA) {																									// Проверка на подлинность РНК цепочки
+	int i, error = 0;
+	for (i = 0; i < RNA.length(); i++) {
+		if (RNA[i] != 'A' && RNA[i] != 'G' && RNA[i] != 'C' && RNA[i] != 'T') {
+			error = 1;
+			break;
+		}
+	}
+	if (error == 1)
+		return 0;
+	else
+		return 1;
+}
+
 int main() {
-	string rna_in;
-	cin >> rna_in;
-	RNA_class RNA(rna_in.length());
-	RNA.RNA_ADD(rna_in);
-	RNA.RNA_out();
+	string rna_in1, rna_in2;
+	cout << "Enter two RNA chains as follows: \"GATCCATGCGTAC\"\n";
+	cin >> rna_in1 >> rna_in2;
+	if (RNA_chek(rna_in1) && (RNA_chek(rna_in2))) {
+		RNA_class RNA1(rna_in1.length());
+		RNA_class RNA2(rna_in2.length());
+		RNA1.RNA_ADD(rna_in1);
+		RNA2.RNA_ADD(rna_in2);
+		cout << "\nRNA chains saved as:\n1 - ";
+		RNA1.RNA_out();
+		cout << "2 - ";
+		RNA2.RNA_out();
+		cout << "Result of operation \"RNA1 == RNA2\" : " << (RNA1 == RNA2);
+		cout << "\nResult of operation \"RNA1 != RNA2\" : " << (RNA1 != RNA2);
+		cout << "\nResult of operation \"RNA1 + RNA2\" : ";
+		(RNA1 + RNA2).RNA_out();
+	}
+	else {
+		cout << "\nYou entered the RNA string incorrectly\n";
+	}
+	cout << "12312";
 	return 0;
 }
