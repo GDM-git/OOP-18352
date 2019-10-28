@@ -1,6 +1,5 @@
+#pragma once
 #include<iostream>
-using namespace std;
-
 enum Nucleotide {																										// Nucleotide
 	A = 0b00000000,
 	G = 0b00000001,
@@ -9,125 +8,32 @@ enum Nucleotide {																										// Nucleotide
 };
 
 class RNA {																												// Class RNA
-private:
-	size_t RNA_size;
-	size_t* RNA_arr;
-public:
-	RNA() : RNA_size(0), RNA_arr(nullptr) {}																			// Constructor
-	RNA(size_t size) : RNA_size(size) {																					// Constructor
-		if (RNA_size != 0) {
-			RNA_arr = new size_t[(RNA_size - 1) / sizeof(size_t) / 4 + 1];
-			for (unsigned int i = 0; i < ((RNA_size - 1) / (sizeof(int) * 4) + 1); i++) {
-				RNA_arr[i] = 0;
-			}
-		}
-		else
-			RNA_arr = nullptr;
-	}
-	RNA(const RNA & RNA_2) : RNA_size(RNA_2.RNA_size) {																	// Copy constructor
-		if (RNA_size != 0) {
-			RNA_arr = new size_t[(RNA_size - 1) / sizeof(size_t) / 4 + 1];
-			for (unsigned int i = 0; i < ((RNA_size - 1) / (sizeof(int) * 4) + 1); i++) {
-				RNA_arr[i] = RNA_2.RNA_arr[i];
-			}
-		}
-		else
-			RNA_arr = nullptr;
-	}
-	~RNA() {																											// Destructor
-		delete RNA_arr;
-		RNA_arr = nullptr;
-	}
-	size_t size() { return RNA_size; }																					// Get size
-	RNA & operator= (const RNA & RNA_2) {																				// Operator =
-		RNA_size = RNA_2.RNA_size;
-		delete RNA_arr;
-		if (RNA_size != 0) {
-			RNA_arr = new size_t[(RNA_size - 1) / sizeof(size_t) / 4 + 1];
-			for (unsigned int i = 0; i < ((RNA_size - 1) / (sizeof(int) * 4) + 1); i++) {
-				RNA_arr[i] = RNA_2.RNA_arr[i];
-			}
-		}
-		else
-			RNA_arr = nullptr;
-	}
-	Nucleotide & operator[] (const size_t & index) {
-		Nucleotide a = A, g = G, c = C, t = T;
-		switch ((RNA_arr[index / (sizeof(size_t) * 4)] >> (2 * (index % (sizeof(size_t) * 4)))) & 3)
-		{
-		case 0:
-			return a;
-		case 1:
-			return g;
-		case 2:
-			return c;
-		case 3:
-			return t;
-		default:
-			break;
-		}
-	}
-};
-
-int main() {
-	size_t i;
-	RNA RNA_1, RNA_2(10);
-	RNA_1 = RNA_2;
-	for (i = 0; i < RNA_1.size; i++) {
-		RNA_1[i] = G;
-	}
-	for (i = 0; i < RNA_1.size; i++) {
-		cout << RNA_1[i];
-	}
-	return 0;
-}
-#include<iostream>
-using namespace std;
-
-enum Nucleotide {																										// Nucleotide
-	A = 0b00000000,
-	G = 0b00000001,
-	C = 0b00000010,
-	T = 0b00000011
-};
-
-class RNA {																												// Class RNA
-	Nucleotide KOSTIL(size_t index) {
-		Nucleotide a = A, g = G, c = C, t = T;
-		switch ((RNA_arr[index / (sizeof(size_t) * 4)] >> (2 * (index % (sizeof(size_t) * 4)))) & 3)
-		{
-		case 0:
-			return a;
-		case 1:
-			return g;
-		case 2:
-			return c;
-		case 3:
-			return t;
-		default:
-			break;
-		}
-	}
 	friend class jab;
 	class jab {																											// Class jab
 	private:
 		size_t jab_index;
-		Nucleotide* jab_arr;
+		RNA* jab_RNA;
 	public:
-		jab() : jab_arr(nullptr), jab_index(0) {}																		// jab Constructor
-		jab(RNA RNA_received, size_t index_byte) {																		// jab Constructor
-			jab_index = index_byte;
-			jab_arr = new Nucleotide[4];
-			for (unsigned int i = 0; i < 4; i++) {
-				jab_arr[i] = RNA_received.KOSTIL((jab_index - 1) * 4 + i);
+		jab(RNA* RNA_received, size_t index_nucleotide) {																// jab Constructor
+			jab_index = index_nucleotide;
+			jab_RNA = RNA_received;
+		}
+		jab& operator= (Nucleotide Nucleotide_add) {																	// jab Operator =
+			jab_RNA->RNA_arr[jab_index / (sizeof(size_t) * 4)] = ((jab_RNA->RNA_arr[jab_index / (sizeof(size_t) * 4)]) & (~((size_t)3 << (2 * (jab_index % (sizeof(size_t) * 4)))))) | (Nucleotide_add << (2 * (jab_index % (sizeof(size_t) * 4))));
+			return *this;
+		}
+		operator Nucleotide() const {																					// Nucleotide_type
+			switch ((jab_RNA->RNA_arr[jab_index / (sizeof(size_t) * 4)] >> (2 * (jab_index % (sizeof(size_t) * 4)))) & 3)
+			{
+			case 0:
+				return A;
+			case 1:
+				return G;
+			case 2:
+				return C;
+			case 3:
+				return T;
 			}
-		}
-		~jab() {																										// jab Destructor
-			delete jab_arr;
-			jab_arr = nullptr;
-		}
-		Nucleotide & operator[] (size_t index) {																		// jab Operator []
-			return jab_arr[index];
 		}
 	};
 private:
@@ -135,11 +41,14 @@ private:
 	size_t* RNA_arr;
 public:
 	RNA() : RNA_size(0), RNA_arr(nullptr) {}																			// Constructor
-	RNA(size_t size) : RNA_size(size) {																					// Constructor
+	RNA(Nucleotide Nucl,size_t size) : RNA_size(size) {																	// Constructor
 		if (RNA_size != 0) {
-			RNA_arr = new size_t[(RNA_size - 1) / sizeof(size_t) / 4 + 1];
-			for (unsigned int i = 0; i < ((RNA_size - 1) / (sizeof(int) * 4) + 1); i++) {
+			RNA_arr = new size_t[(RNA_size - 1) / (sizeof(size_t) * 4) + 1];
+			for (size_t i = 0; i < ((RNA_size - 1) / (sizeof(size_t) * 4) + 1); i++) {
 				RNA_arr[i] = 0;
+				for (size_t j = 0; j < sizeof(size_t) * 4; j++) {
+					RNA_arr[i] = RNA_arr[i] | (Nucl << (2 * j));
+				}
 			}
 		}
 		else
@@ -147,8 +56,8 @@ public:
 	}
 	RNA(const RNA& RNA_2) : RNA_size(RNA_2.RNA_size) {																	// Copy constructor
 		if (RNA_size != 0) {
-			RNA_arr = new size_t[(RNA_size - 1) / sizeof(size_t) / 4 + 1];
-			for (unsigned int i = 0; i < ((RNA_size - 1) / (sizeof(int) * 4) + 1); i++) {
+			RNA_arr = new size_t[(RNA_size - 1) / (sizeof(size_t) * 4) + 1];
+			for (size_t i = 0; i < ((RNA_size - 1) / (sizeof(size_t) * 4) + 1); i++) {
 				RNA_arr[i] = RNA_2.RNA_arr[i];
 			}
 		}
@@ -156,16 +65,16 @@ public:
 			RNA_arr = nullptr;
 	}
 	~RNA() {																											// Destructor
-		delete RNA_arr;
+		delete[] RNA_arr;
 		RNA_arr = nullptr;
 	}
-	size_t & size() { return RNA_size; }																				// Get size
+	size_t RNA_length() { return RNA_size; }																			// RNA_length
 	RNA& operator= (const RNA& RNA_2) {																					// Operator =
 		RNA_size = RNA_2.RNA_size;
-		delete RNA_arr;
+		delete[] RNA_arr;
 		if (RNA_size != 0) {
-			RNA_arr = new size_t[(RNA_size - 1) / sizeof(size_t) / 4 + 1];
-			for (unsigned int i = 0; i < ((RNA_size - 1) / (sizeof(int) * 4) + 1); i++) {
+			RNA_arr = new size_t[(RNA_size - 1) / (sizeof(size_t) * 4) + 1];
+			for (size_t i = 0; i < ((RNA_size - 1) / (sizeof(size_t) * 4) + 1); i++) {
 				RNA_arr[i] = RNA_2.RNA_arr[i];
 			}
 		}
@@ -173,21 +82,155 @@ public:
 			RNA_arr = nullptr;
 		return *this;
 	}
-	Nucleotide & operator[] (const size_t& index) {																		// Operator []
-		jab Nucl(*this, index / 4 + 1);
+	jab operator[] (size_t index) {																						// Operator []
+		jab Nucl(this, index);
 		return Nucl;
 	}
+	Nucleotide operator[] (size_t index) const {																		// Operator []
+		RNA RNA_new(*this);
+		const jab Nucl(&RNA_new, index);
+		return Nucl;
+	}
+	friend std::ostream& operator<< (std::ostream& out, const RNA& RNA) {												// Operator <<
+		if (RNA.RNA_size == 0) {
+			return out;
+		}
+		for (size_t i = 0; i < RNA.RNA_size; i++) {
+			switch ((Nucleotide)RNA[i])
+			{
+			case A:
+				out << "A";
+				break;
+			case G:
+				out << "G";
+				break;
+			case C:
+				out << "C";
+				break;
+			case T:
+				out << "T";
+				break;
+			default:
+				break;
+			}
+		}
+		return out;
+	}
+	RNA operator! () const {																							// Operator !
+		RNA RNA_new(*this);
+		if (RNA_size != 0) {
+			for (size_t i = 0; i < ((RNA_size - 1) / (sizeof(size_t) * 4) + 1); i++) {
+				RNA_new.RNA_arr[i] = ~RNA_new.RNA_arr[i];
+			}
+		}
+		return RNA_new;
+	}
+	bool operator== (const RNA& RNA_2) const {																			// Operator ==
+		if (RNA_size == RNA_2.RNA_size) {
+			if (RNA_size != 0) {
+				bool answer = 1;
+				for (size_t i = 0; i < ((RNA_size - 1) / (sizeof(size_t) * 4) + 1); i++) {
+					if (RNA_arr[i] != RNA_2.RNA_arr[i]) {
+						answer = 0;
+						break;
+					}
+				}
+				return answer;
+			}
+			else 
+				return 1;
+		}
+		else 
+			return 0;
+	}
+	bool operator!= (const RNA& RNA_2) const {																			// Operator !=
+		if (RNA_size == RNA_2.RNA_size) {
+			if (RNA_size != 0) {
+				bool answer = 0;
+				for (size_t i = 0; i < ((RNA_size - 1) / (sizeof(size_t) * 4) + 1); i++) {
+					if (RNA_arr[i] != RNA_2.RNA_arr[i]) {
+						answer = 1;
+						break;
+					}
+				}
+				return answer;
+			}
+			else
+				return 0;
+		}
+		else
+			return 1;
+	}
+	bool RNA_complementarity(const RNA& RNA_2) const{																	// RNA_complementarity
+		if (*this == !RNA_2) {
+			return 1;
+		}
+		else 
+			return 0;
+	}
+	size_t RNA_cardinality(Nucleotide Nucl) const{																		// RNA_cardinality
+		if (RNA_size != 0) {
+			size_t register_nucl = 0;
+			for (size_t i = 0; i < RNA_size; i++) {
+				if (this->operator[](i) == Nucl) register_nucl++;
+			}
+			return register_nucl;
+		}
+		else 
+			return 0;
+	}
+	RNA operator+ (const RNA& RNA_2) const{																				// Operator +
+		RNA RNA_new(A, RNA_size + RNA_2.RNA_size);
+		if (RNA_new.RNA_size != 0) {
+			size_t i = 0;
+			for (; i < RNA_size; i++) {
+				RNA_new[i] = this->operator[](i);
+			}
+			for (; i < RNA_size + RNA_2.RNA_size; i++) {
+				RNA_new[i] = RNA_2[i - RNA_size];
+			}
+		}
+		return RNA_new;
+	}
+	void RNA_trim(size_t last_index) {																					// RNA_trim
+		if (last_index < RNA_size) {
+			RNA_size = last_index;
+			if (RNA_size != 0) {
+				RNA RNA_new(*this);
+				delete[] RNA_arr;
+				RNA_arr = new size_t[(RNA_size - 1) / (sizeof(size_t) * 4) + 1];
+				for (size_t i = 0; i < ((RNA_size - 1) / (sizeof(size_t) * 4)) + 1; i++) {
+					RNA_arr[i] = RNA_new.RNA_arr[i];
+				}
+				if (last_index % (sizeof(size_t) * 4) != 0) {
+					RNA_arr[(RNA_size - 1) / (sizeof(size_t) * 4)] = ((RNA_arr[(RNA_size - 1) / (sizeof(size_t) * 4)] << (2 * ((sizeof(size_t) * 4) - (last_index % (sizeof(size_t) * 4))))) >> (2 * ((sizeof(size_t) * 4) - (last_index % (sizeof(size_t) * 4)))));
+				}
+			}
+			else
+				RNA_arr = nullptr;
+		}
+	}
+	RNA RNA_split(size_t last_index) const{																				// RNA_split
+		if (last_index < RNA_size) {
+			RNA RNA_new;
+			RNA_new.RNA_size = RNA_size - last_index;
+			RNA_new.RNA_arr = new size_t[(RNA_size - 1) / (sizeof(size_t) * 4) + 1];
+			if (last_index % (sizeof(size_t) * 4) != 0) {
+				for (size_t i = 0; i < (RNA_new.RNA_size - 1) / (sizeof(size_t) * 4); i++) {
+					RNA_new.RNA_arr[i] = (RNA_arr[last_index / (sizeof(size_t) * 4) + i] >> (2 * (last_index % (sizeof(size_t) * 4)))) | (RNA_arr[last_index / (sizeof(size_t) * 4) + i + 1] << (2 * ((sizeof(size_t)) * 4 - last_index % (sizeof(size_t) * 4))));
+				}
+				RNA_new.RNA_arr[(RNA_size - 1) / (sizeof(size_t) * 4)] = RNA_arr[(RNA_size - 1) / (sizeof(size_t) * 4)] >> (2 * (last_index % (sizeof(size_t) * 4)));
+			}
+			else {
+				for (size_t i = 0; i < (RNA_new.RNA_size - 1) / ((sizeof(size_t) * 4) + 1); i++) {
+					RNA_new.RNA_arr[i] = RNA_arr[last_index / (sizeof(size_t) * 4) + i];
+				}
+			}
+			return RNA_new;
+		}
+		else {
+			RNA RNA_0;
+			return RNA_0;
+		}
+	}
 };
-
-int main() {																											// main
-	size_t i;
-	RNA RNA_1, RNA_2(10);
-	RNA_1 = RNA_2;
-	for (i = 0; i < RNA_1.size(); i++) {
-		RNA_1[i] = G;
-	}
-	for (i = 0; i < RNA_1.size(); i++) {
-		cout << RNA_1[i];
-	}
-	return 0;
-}
