@@ -82,7 +82,7 @@ public:
 			RNA_arr = nullptr;
 		return *this;
 	}
-	jab operator[] (size_t index) {																						//* Operator []
+	jab operator[] (size_t index) {																						// Operator []
 		if (index <= RNA_size) {
 			jab Nucl(this, index);
 			return Nucl;
@@ -92,13 +92,8 @@ public:
 			for (size_t i = 0; i < ((RNA_size - 1) / (sizeof(size_t) * 4) + 1); i++) {
 				RNA_new.RNA_arr[i] = RNA_arr[i];
 			}
-			size_t past_size = RNA_size;
-			//RNA_new.RNA_arr[(RNA_size - 1) / (sizeof(size_t) * 4)] = RNA_new.RNA_arr[(RNA_size - 1) / (sizeof(size_t) * 4)] & ();
+			RNA_new.RNA_arr[(RNA_size - 1) / (sizeof(size_t) * 4)] = (RNA_new.RNA_arr[(RNA_size - 1) / (sizeof(size_t) * 4)] << (2 * (sizeof(size_t) * 4 - (RNA_size - 1) % (sizeof(size_t) * 4) - 1))) >> (2 * (sizeof(size_t) * 4 - (RNA_size - 1) % (sizeof(size_t) * 4) - 1));
 			*this = RNA_new;
-			for (size_t i = 0; i < sizeof(size_t) - past_size % (sizeof(size_t) * 4); i++) {
-				jab corrective(this, past_size + 1 + i);
-				corrective = A;
-			}
 			jab Nucl(this, index);
 			return Nucl;
 		}
@@ -255,18 +250,21 @@ public:
 using namespace std;
 
 int main() {																											// main
-	RNA RNA_1(A,7), RNA_2;
+	RNA RNA_1(A, 7), RNA_2, RNA_3;
 	RNA_1[4] = G;
 	RNA_2 = !RNA_1;
-	RNA_2[120] = A;
+	RNA_3 = RNA_2;
+	RNA_3[10] = G;
 	cout << "Output RNA_1:\n" << RNA_1 << "\n___________________________________________________________________________________________\n";
 	cout << "\nOutput 'RNA_2':\n" << RNA_2 << "\n___________________________________________________________________________________________\n";
-	//cout << "\nOutput 'RNA_1 == RNA_2 ; RNA_1 != RNA_2':\n" << (RNA_1 == RNA_2) << " ; " << (RNA_1 != RNA_2) << "\n___________________________________________________________________________________________\n";
-	//cout << "\nOutput 'RNA_1 + RNA_2':\n" << RNA_1 + RNA_2 << "\n___________________________________________________________________________________________\n";
-	//cout << "\nOutput 'RNA_1.RNA_complementarity(RNA_2)':\n" << RNA_1.RNA_complementarity(RNA_2) << "\n___________________________________________________________________________________________\n";
-	//cout << "\nOutput '(RNA_1 + RNA_2).RNA_cardinality(T)':\n" << (RNA_1 + RNA_2).RNA_cardinality(T) << "\n___________________________________________________________________________________________\n";
-	//RNA_1.RNA_trim(5);
-	//cout << "\nOutput 'RNA_1.RNA_trim(4)':\n" << RNA_1 << "\n___________________________________________________________________________________________\n";
-	//cout << "\nOutput 'RNA_1.RNA_split()':\n" << RNA_2.RNA_split(3) << "\n___________________________________________________________________________________________\n";
+	cout << "\nOutput 'RNA_3':\n" << RNA_3 << "\n___________________________________________________________________________________________\n";
+	cout << "\nOutput 'RNA_1 == RNA_2 ; RNA_1 != RNA_2':\n" << (RNA_1 == RNA_2) << " ; " << (RNA_1 != RNA_2) << "\n___________________________________________________________________________________________\n";
+	cout << "\nOutput 'RNA_1 + RNA_2':\n" << RNA_1 + RNA_2 << "\n___________________________________________________________________________________________\n";
+	cout << "\nOutput 'RNA_1.RNA_complementarity(RNA_2)':\n" << RNA_1.RNA_complementarity(RNA_2) << "\n___________________________________________________________________________________________\n";
+	cout << "\nOutput '(RNA_1 + RNA_2).RNA_cardinality(T)':\n" << (RNA_1 + RNA_2).RNA_cardinality(T) << "\n___________________________________________________________________________________________\n";
+	RNA_1.RNA_trim(5);
+	cout << "\nOutput 'RNA_1.RNA_trim(4)':\n" << RNA_1 << "\n___________________________________________________________________________________________\n";
+	cout << "\nOutput 'RNA_1.RNA_split()':\n" << RNA_2.RNA_split(3) << "\n___________________________________________________________________________________________\n";
+	system("pause");
 	return 0;
 }
