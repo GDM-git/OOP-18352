@@ -27,7 +27,7 @@ public:
 	RNA(Nucleotide Nucl, size_t size);																						// Constructor
 	RNA(const RNA& RNA_2);																									// Copy constructor
 	~RNA();																													// Destructor
-	size_t RNA_length();																									// RNA_length
+	size_t RNA_length() const;																								// RNA_length
 	RNA& operator= (const RNA& RNA_2);																						// Operator =
 	jab operator[] (size_t index);																							// Operator []
 	Nucleotide operator[] (size_t index) const;																				// Operator []
@@ -37,7 +37,8 @@ public:
 	bool operator!= (const RNA& RNA_2) const;																				// Operator !=
 	bool RNA_complementarity(const RNA& RNA_2) const;																		// RNA_complementarity
 	size_t RNA_cardinality(Nucleotide Nucl) const;																			// RNA_cardinality
-	RNA operator+ (const RNA& RNA_2) const;																					//* Operator +
+	size_t RNA_capacity() const;																							// RNA_capasity 
+	RNA operator+ (const RNA& RNA_2) const;																					// Operator +
 	void RNA_trim(size_t last_index);																						// RNA_trim
 	RNA RNA_split(size_t last_index) const;																					// RNA_split
 	std::unordered_map < Nucleotide, size_t, std::hash<size_t> > RNA_cardinality() const;									// unordered_map
