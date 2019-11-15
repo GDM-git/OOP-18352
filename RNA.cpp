@@ -61,6 +61,7 @@ RNA::~RNA() {																												// Destructor
 }
 size_t RNA::RNA_length() const { return RNA_size; }																			// RNA_length
 RNA& RNA::operator= (const RNA& RNA_2) {																					// Operator =
+	if (&RNA_2 == this) return *this;
 	RNA_size = RNA_2.RNA_size;
 	delete[] RNA_arr;
 	if (RNA_size != 0) {
@@ -171,7 +172,8 @@ size_t RNA::RNA_cardinality(Nucleotide Nucl) const {																		// RNA_car
 		return 0;
 }
 size_t RNA::RNA_capacity() const{
-	size_t cap = ((this->RNA_size - 1) / (sizeof(size_t) * 4) + 1);
+	if (RNA_size == 0) return 0;
+	size_t cap = ((RNA_size - 1) / (sizeof(size_t) * 4) + 1);
 	return cap;
 }
 RNA RNA::operator+ (const RNA& RNA_2) const {																				// Operator +
