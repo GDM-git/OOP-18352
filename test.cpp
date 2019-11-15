@@ -72,19 +72,31 @@ TEST(TestNot, TestNotRnk) {
 	Nucleotide n = C;
 	RNA rn1(n, 1000);
 	RNA rn2;
-	rn2 = rn1;
+	rn2 = !rn1;
 	EXPECT_EQ(rn1.RNA_length(), rn2.RNA_length());
 	EXPECT_EQ(rn1.RNA_capacity(), rn2.RNA_capacity());
 	bool tmp = true;
-	bool IsEqual = (rn1 == rn2);
 	for (size_t i = 0; i < rn1.RNA_length(); i++) {
-		if (rn1[i] != rn2[i]) {
-			tmp = false;
+		switch ((Nucleotide)rn1[i])
+		{
+			case A:
+				if (rn2[i] != T) tmp = false;
+				break;
+			case C:
+				if (rn2[i] != G) tmp = false;
+				break;
+			case G:
+				if (rn2[i] != C) tmp = false;
+				break;
+			case T:
+				if (rn2[i] != A) tmp = false;
+				break;
+		default:
 			break;
 		}
+		if (tmp == false) break;
 	}
 	EXPECT_TRUE(tmp);
-	EXPECT_TRUE(IsEqual);
 }
 TEST(TrimTest, TestTrimRNK) {
 	RNA rn2(G, 1000);
@@ -205,18 +217,17 @@ TEST(TestIsCompl, TestIsComplRnk) {
 	size_t size = 10000;
 	Nucleotide n = C;
 	RNA rn1(n, size);
-	RNA rn2 = rn1;
-	!rn1;
+	RNA rn2 = !rn1;
 	EXPECT_TRUE(rn1.RNA_complementarity(rn2));
 }
 
 TEST(TestSplit, TestSplitRunTime) {
-	size_t size = 10000;// 000;
-	size_t splitNum = 100;//00;
+	size_t size = 10000;
+	size_t splitNum = 100;
 	Nucleotide n = C;
 	RNA rn1(n, size);
 	const RNA rn2 = rn1.RNA_split(splitNum);
-	!rn1;
+	rn1 = !rn1;
 	size_t tmpSize = rn1.RNA_length();
 	bool tmp = true;
 	for (size_t i = 0; i < tmpSize; i++) {
@@ -224,7 +235,7 @@ TEST(TestSplit, TestSplitRunTime) {
 			tmp = false;
 			break;
 		}
-		if (rn2[i + tmpSize] != C) {
+		if (i >= tmpSize && rn2[i - tmpSize] != C) {
 			tmp = false;
 			break;
 		}
