@@ -2,10 +2,10 @@
 #include<iostream>
 #include<unordered_map>
 enum Nucleotide {																											// Nucleotide
-	A = 0b00000000,
-	G = 0b00000001,
-	C = 0b00000010,
-	T = 0b00000011
+	A = 0,
+	G = 1,
+	C = 2,
+	T = 3
 };
 
 class RNA {																													// Class RNA
