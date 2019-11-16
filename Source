@@ -1,0 +1,11 @@
+#include"pch.h"
+#include<iostream>
+#include"RNA.h"
+#include<cassert>
+#include<ctime>
+
+int main(int argc, char* argv[]) {
+	setlocale(LC_ALL, "");
+	::testing::InitGoogleTest(&argc, argv);
+	return RUN_ALL_TESTS();
+}
