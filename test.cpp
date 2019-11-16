@@ -1,20 +1,20 @@
 #include "pch.h"
 #include "gtest/gtest.h"
-#include "../Project 1/RNA.h"
+#include "RNA.h"
 
 TEST(TestInit, TestRnkConstructor) {
 	Nucleotide Nucle = C;
-	const RNA RNA_test(Nucle, 1000);
+	RNA RNA_test(Nucle, 1000);
 	RNA RNA_test_2;
 	bool tmp = true;
 	for (size_t i = 0; i < RNA_test.RNA_length(); i++) {
-		if (RNA_test[i] != Nucle) {
+		if ((Nucleotide)RNA_test[i] != Nucle) {
 			tmp = false;
 			break;
 		}
 	}
 
-	EXPECT_EQ(1000, RNA_test_2.RNA_length());
+	EXPECT_EQ(1000, RNA_test.RNA_length());
 	EXPECT_EQ(0, RNA_test_2.RNA_length());
 	EXPECT_TRUE(tmp);
 }
@@ -79,18 +79,18 @@ TEST(TestNot, TestNotRnk) {
 	for (size_t i = 0; i < rn1.RNA_length(); i++) {
 		switch ((Nucleotide)rn1[i])
 		{
-			case A:
-				if (rn2[i] != T) tmp = false;
-				break;
-			case C:
-				if (rn2[i] != G) tmp = false;
-				break;
-			case G:
-				if (rn2[i] != C) tmp = false;
-				break;
-			case T:
-				if (rn2[i] != A) tmp = false;
-				break;
+		case A:
+			if (rn2[i] != T) tmp = false;
+			break;
+		case C:
+			if (rn2[i] != G) tmp = false;
+			break;
+		case G:
+			if (rn2[i] != C) tmp = false;
+			break;
+		case T:
+			if (rn2[i] != A) tmp = false;
+			break;
 		default:
 			break;
 		}
@@ -114,8 +114,9 @@ TEST(TestTime, RunTimeSmall) {
 }
 TEST(TestTime, RunTimeBig) {
 	RNA rn;
-	int size = 100000000;
+	int size = 1000000;
 	for (int i = 0; i < size; i++) {
+		rn[i] = G;
 	}
 	EXPECT_TRUE(true);
 }
