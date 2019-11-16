@@ -1,21 +1,34 @@
 #include"RNA.h"
 
 RNA::jab::jab(RNA* const RNA_received, size_t index_nucleotide) : jab_index(index_nucleotide), jab_RNA(RNA_received) {};	// jab Constructor
-RNA::jab & RNA::jab::operator= (Nucleotide Nucleotide_add) {																// jab Operator =
-	if (jab_index <= jab_RNA->RNA_size) {
+RNA::jab& RNA::jab::operator= (Nucleotide Nucleotide_add) {																// jab Operator =
+	if (jab_index < jab_RNA->RNA_size) {
 		jab_RNA->RNA_arr[jab_index / (sizeof(size_t) * 4)] = ((jab_RNA->RNA_arr[jab_index / (sizeof(size_t) * 4)]) & (~((size_t)3 << (2 * (jab_index % (sizeof(size_t) * 4)))))) | (Nucleotide_add << (2 * (jab_index % (sizeof(size_t) * 4))));
 		return *this;
 	}
 	else {
-		RNA RNA_new(A, jab_index * 2);
-		RNA_new.RNA_size = jab_index + 1;
-		for (size_t i = 0; i < ((jab_RNA->RNA_size - 1) / (sizeof(size_t) * 4) + 1); i++) {
-			RNA_new.RNA_arr[i] = jab_RNA->RNA_arr[i];
+		if (jab_RNA->RNA_size == 0) {
+			RNA RNA_new(A, jab_index + 1);
+			*jab_RNA = RNA_new;
+			jab_RNA->RNA_arr[0] = Nucleotide_add;
+			return *this;
 		}
-		RNA_new.RNA_arr[(jab_RNA->RNA_size - 1) / (sizeof(size_t) * 4)] = (RNA_new.RNA_arr[(jab_RNA->RNA_size - 1) / (sizeof(size_t) * 4)] << (2 * (sizeof(size_t) * 4 - (jab_RNA->RNA_size - 1) % (sizeof(size_t) * 4) - 1))) >> (2 * (sizeof(size_t) * 4 - (jab_RNA->RNA_size - 1) % (sizeof(size_t) * 4) - 1));
-		*jab_RNA = RNA_new;
-		jab_RNA->RNA_arr[jab_index / (sizeof(size_t) * 4)] = ((jab_RNA->RNA_arr[jab_index / (sizeof(size_t) * 4)]) & (~((size_t)3 << (2 * (jab_index % (sizeof(size_t) * 4)))))) | (Nucleotide_add << (2 * (jab_index % (sizeof(size_t) * 4))));
-		return *this;
+		else {
+			if (sizeof(jab_RNA->RNA_arr) / sizeof(size_t) >= (jab_index / (sizeof(size_t) * 4))) {
+				jab_RNA->RNA_size = jab_index + 1;
+				jab_RNA->RNA_arr[jab_index / (sizeof(size_t) * 4)] = ((jab_RNA->RNA_arr[jab_index / (sizeof(size_t) * 4)]) & (~((size_t)3 << (2 * (jab_index % (sizeof(size_t) * 4)))))) | (Nucleotide_add << (2 * (jab_index % (sizeof(size_t) * 4))));
+				return *this;
+			}
+			RNA RNA_new(A, jab_index * 2);
+			RNA_new.RNA_size = jab_index + 1;
+			for (size_t i = 0; i < ((jab_RNA->RNA_size - 1) / (sizeof(size_t) * 4) + 1); i++) {
+				RNA_new.RNA_arr[i] = jab_RNA->RNA_arr[i];
+			}
+			RNA_new.RNA_arr[(jab_RNA->RNA_size - 1) / (sizeof(size_t) * 4)] = (RNA_new.RNA_arr[(jab_RNA->RNA_size - 1) / (sizeof(size_t) * 4)] << (2 * (sizeof(size_t) * 4 - (jab_RNA->RNA_size - 1) % (sizeof(size_t) * 4) - 1))) >> (2 * (sizeof(size_t) * 4 - (jab_RNA->RNA_size - 1) % (sizeof(size_t) * 4) - 1));
+			*jab_RNA = RNA_new;
+			jab_RNA->RNA_arr[jab_index / (sizeof(size_t) * 4)] = ((jab_RNA->RNA_arr[jab_index / (sizeof(size_t) * 4)]) & (~((size_t)3 << (2 * (jab_index % (sizeof(size_t) * 4)))))) | (Nucleotide_add << (2 * (jab_index % (sizeof(size_t) * 4))));
+			return *this;
+		}
 	}
 }
 RNA::jab::operator Nucleotide() const {																						// Nucleotide_type
@@ -83,7 +96,7 @@ Nucleotide RNA::operator[] (size_t index) const {																			// Operator 
 	const jab Nucl(&RNA_new, index);
 	return Nucl;
 }
-	std::ostream& operator<< (std::ostream& out, const RNA& RNA) {															// Operator <<
+std::ostream& operator<< (std::ostream& out, const RNA& RNA) {															// Operator <<
 	if (RNA.RNA_size == 0) {
 		return out;
 	}
@@ -171,7 +184,7 @@ size_t RNA::RNA_cardinality(Nucleotide Nucl) const {																		// RNA_car
 	else
 		return 0;
 }
-size_t RNA::RNA_capacity() const{
+size_t RNA::RNA_capacity() const {
 	if (RNA_size == 0) return 0;
 	size_t cap = ((RNA_size - 1) / (sizeof(size_t) * 4) + 1);
 	return cap;
