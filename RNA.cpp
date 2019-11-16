@@ -1,7 +1,8 @@
+#include"pch.h"
 #include"RNA.h"
 
 RNA::jab::jab(RNA* const RNA_received, size_t index_nucleotide) : jab_index(index_nucleotide), jab_RNA(RNA_received) {};	// jab Constructor
-RNA::jab & RNA::jab::operator= (Nucleotide Nucleotide_add) {																// jab Operator =
+RNA::jab& RNA::jab::operator= (Nucleotide Nucleotide_add) {																// jab Operator =
 	if (jab_index < jab_RNA->RNA_size) {
 		//jab_RNA->RNA_arr[jab_index / (sizeof(size_t) * 4)] = ((jab_RNA->RNA_arr[jab_index / (sizeof(size_t) * 4)]) & (~((size_t)3 << (2 * (jab_index % (sizeof(size_t) * 4)))))) | (Nucleotide_add << (2 * (jab_index % (sizeof(size_t) * 4))));
 		std::cout << "Error! RNA don't change in middle";
@@ -16,7 +17,7 @@ RNA::jab & RNA::jab::operator= (Nucleotide Nucleotide_add) {																// j
 		}
 		else {
 			size_t kkk = sizeof(jab_RNA->RNA_arr);
-			if (kkk/sizeof(size_t) > (jab_index / (sizeof(size_t) * 4))) {
+			if (kkk / sizeof(size_t) > (jab_index / (sizeof(size_t) * 4))) {
 				jab_RNA->RNA_size = jab_index + 1;
 				jab_RNA->RNA_arr[jab_index / (sizeof(size_t) * 4)] = ((jab_RNA->RNA_arr[jab_index / (sizeof(size_t) * 4)]) & (~((size_t)3 << (2 * (jab_index % (sizeof(size_t) * 4)))))) | (Nucleotide_add << (2 * (jab_index % (sizeof(size_t) * 4))));
 				return *this;
@@ -200,19 +201,17 @@ RNA RNA::operator+ (const RNA& RNA_2) const {																				// Operator +
 		RNA RNA_new(*this);
 		return RNA_new;
 	}
+	size_t i = 0;
 	RNA RNA_new(A, RNA_size + RNA_2.RNA_size);
-	if (RNA_new.RNA_size != 0) {
-		size_t i = 0;
-		for (; i < (RNA_size - 1) / (sizeof(size_t) * 4) + 1; i++) {
-			RNA_new.RNA_arr[i] = RNA_arr[i];
-		}
-		i = i - 1;
-		for (; i < (RNA_size + RNA_2.RNA_size - 1) / (sizeof(size_t) * 4); i++) {
-			RNA_new.RNA_arr[i] = RNA_new.RNA_arr[i] | (RNA_2.RNA_arr[i - (RNA_size - 1) / (sizeof(size_t) * 4)] << (2 * (RNA_size % (sizeof(size_t) * 4))));
-			RNA_new.RNA_arr[i + 1] = RNA_new.RNA_arr[i + 1] | (RNA_2.RNA_arr[i - (RNA_size - 1) / (sizeof(size_t) * 4)] >> (2 * ((sizeof(size_t) * 4) - RNA_size % (sizeof(size_t) * 4))));
-		}
-		RNA_new.RNA_arr[i] = RNA_new.RNA_arr[i] | (RNA_2.RNA_arr[i - (RNA_size - 1) / (sizeof(size_t) * 4)] << (2 * (RNA_size % (sizeof(size_t) * 4))));
+	for (; i < (RNA_size - 1) / (sizeof(size_t) * 4) + 1; i++) {
+		RNA_new.RNA_arr[i] = RNA_arr[i];
 	}
+	RNA_new.RNA_arr[(RNA_size - 1) / (sizeof(size_t) * 4)] = RNA_new.RNA_arr[(RNA_size - 1) / (sizeof(size_t) * 4)] << (2 * ((sizeof(size_t) * 4) - (RNA_size % (sizeof(size_t) * 4)))) >> (2 * ((sizeof(size_t) * 4) - (RNA_size % (sizeof(size_t) * 4))));
+	for (; i < (RNA_new.RNA_size - 1) / (sizeof(size_t) * 4) + 1; i++) {
+		RNA_new.RNA_arr[i - 1] = RNA_new.RNA_arr[i - 1] | (RNA_2.RNA_arr[i - ((RNA_size - 1) / (sizeof(size_t) * 4) + 1)] << (2 * (RNA_size % (sizeof(size_t) * 4))));
+		RNA_new.RNA_arr[i] = RNA_2.RNA_arr[i - ((RNA_size - 1) / (sizeof(size_t) * 4) + 1)] >> (2 * ((sizeof(size_t) * 4) - (RNA_size % (sizeof(size_t) * 4))));
+	}
+	RNA_new.RNA_arr[(RNA_new.RNA_size - 1) / (sizeof(size_t) * 4)] = RNA_new.RNA_arr[(RNA_new.RNA_size - 1) / (sizeof(size_t) * 4)] | (RNA_2.RNA_arr[(RNA_2.RNA_size - 1) / (sizeof(size_t) * 4)] << (2 * (RNA_size % (sizeof(size_t) * 4))));
 	return RNA_new;
 }
 void RNA::RNA_trim(size_t last_index) {																						// RNA_trim
