@@ -1,9 +1,10 @@
 #include"RNA.h"
 
 RNA::jab::jab(RNA* const RNA_received, size_t index_nucleotide) : jab_index(index_nucleotide), jab_RNA(RNA_received) {};	// jab Constructor
-RNA::jab& RNA::jab::operator= (Nucleotide Nucleotide_add) {																// jab Operator =
+RNA::jab & RNA::jab::operator= (Nucleotide Nucleotide_add) {																// jab Operator =
 	if (jab_index < jab_RNA->RNA_size) {
-		jab_RNA->RNA_arr[jab_index / (sizeof(size_t) * 4)] = ((jab_RNA->RNA_arr[jab_index / (sizeof(size_t) * 4)]) & (~((size_t)3 << (2 * (jab_index % (sizeof(size_t) * 4)))))) | (Nucleotide_add << (2 * (jab_index % (sizeof(size_t) * 4))));
+		//jab_RNA->RNA_arr[jab_index / (sizeof(size_t) * 4)] = ((jab_RNA->RNA_arr[jab_index / (sizeof(size_t) * 4)]) & (~((size_t)3 << (2 * (jab_index % (sizeof(size_t) * 4)))))) | (Nucleotide_add << (2 * (jab_index % (sizeof(size_t) * 4))));
+		std::cout << "Error! RNA don't change in middle";
 		return *this;
 	}
 	else {
@@ -14,7 +15,8 @@ RNA::jab& RNA::jab::operator= (Nucleotide Nucleotide_add) {																// ja
 			return *this;
 		}
 		else {
-			if (sizeof(jab_RNA->RNA_arr) / sizeof(size_t) >= (jab_index / (sizeof(size_t) * 4))) {
+			size_t kkk = sizeof(jab_RNA->RNA_arr);
+			if (kkk/sizeof(size_t) > (jab_index / (sizeof(size_t) * 4))) {
 				jab_RNA->RNA_size = jab_index + 1;
 				jab_RNA->RNA_arr[jab_index / (sizeof(size_t) * 4)] = ((jab_RNA->RNA_arr[jab_index / (sizeof(size_t) * 4)]) & (~((size_t)3 << (2 * (jab_index % (sizeof(size_t) * 4)))))) | (Nucleotide_add << (2 * (jab_index % (sizeof(size_t) * 4))));
 				return *this;
