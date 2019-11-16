@@ -114,7 +114,7 @@ TEST(TestTime, RunTimeSmall) {
 }
 TEST(TestTime, RunTimeBig) {
 	RNA rn;
-	int size = 1000000;
+	int size = 10000;//00;
 	for (int i = 0; i < size; i++) {
 		rn[i] = G;
 	}
