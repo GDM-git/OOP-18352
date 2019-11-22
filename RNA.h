@@ -22,6 +22,7 @@ class RNA {																													// Class RNA
 private:
 	size_t RNA_size;
 	size_t* RNA_arr;
+	size_t RNA_memory;
 public:
 	RNA();																													// Constructor
 	RNA(Nucleotide Nucl, size_t size);																						// Constructor
