@@ -12,17 +12,16 @@ RNA::jab& RNA::jab::operator= (Nucleotide Nucleotide_add) {																// ja
 		if (jab_RNA->RNA_size == 0) {
 			RNA RNA_new(A, jab_index + 1);
 			*jab_RNA = RNA_new;
-			jab_RNA->RNA_arr[0] = Nucleotide_add;
+			jab_RNA->RNA_arr[jab_index / (sizeof(size_t) * 4)] = ((jab_RNA->RNA_arr[jab_index / (sizeof(size_t) * 4)]) & (~((size_t)3 << (2 * (jab_index % (sizeof(size_t) * 4)))))) | (Nucleotide_add << (2 * (jab_index % (sizeof(size_t) * 4))));
 			return *this;
 		}
 		else {
-			size_t kkk = sizeof(jab_RNA->RNA_arr);
-			if (kkk / sizeof(size_t) > (jab_index / (sizeof(size_t) * 4))) {
+			if (jab_RNA->RNA_memory > (jab_index / (sizeof(size_t) * 4))) {
 				jab_RNA->RNA_size = jab_index + 1;
 				jab_RNA->RNA_arr[jab_index / (sizeof(size_t) * 4)] = ((jab_RNA->RNA_arr[jab_index / (sizeof(size_t) * 4)]) & (~((size_t)3 << (2 * (jab_index % (sizeof(size_t) * 4)))))) | (Nucleotide_add << (2 * (jab_index % (sizeof(size_t) * 4))));
 				return *this;
 			}
-			RNA RNA_new(A, jab_index * 2);
+			RNA RNA_new(A, (jab_index + 1) * 2);
 			RNA_new.RNA_size = jab_index + 1;
 			for (size_t i = 0; i < ((jab_RNA->RNA_size - 1) / (sizeof(size_t) * 4) + 1); i++) {
 				RNA_new.RNA_arr[i] = jab_RNA->RNA_arr[i];
@@ -47,9 +46,10 @@ RNA::jab::operator Nucleotide() const {																						// Nucleotide_type
 		return T;
 	}
 }
-RNA::RNA() : RNA_size(0), RNA_arr(nullptr) {}																				// Constructor
+RNA::RNA() : RNA_size(0), RNA_arr(nullptr), RNA_memory(0) {}																// Constructor
 RNA::RNA(Nucleotide Nucl, size_t size) : RNA_size(size) {																	// Constructor
 	if (RNA_size != 0) {
+		RNA_memory = (size - 1) / sizeof(size_t) + 1;
 		RNA_arr = new size_t[(RNA_size - 1) / (sizeof(size_t) * 4) + 1];
 		for (size_t i = 0; i < ((RNA_size - 1) / (sizeof(size_t) * 4) + 1); i++) {
 			RNA_arr[i] = 0;
@@ -59,9 +59,12 @@ RNA::RNA(Nucleotide Nucl, size_t size) : RNA_size(size) {																	// Con
 		}
 	}
 	else
+	{
+		RNA_memory = 0;
 		RNA_arr = nullptr;
+	}
 }
-RNA::RNA(const RNA& RNA_2) : RNA_size(RNA_2.RNA_size) {																		// Copy constructor
+RNA::RNA(const RNA& RNA_2) : RNA_size(RNA_2.RNA_size), RNA_memory(RNA_2.RNA_memory) {										// Copy constructor
 	if (RNA_size != 0) {
 		RNA_arr = new size_t[(RNA_size - 1) / (sizeof(size_t) * 4) + 1];
 		for (size_t i = 0; i < ((RNA_size - 1) / (sizeof(size_t) * 4) + 1); i++) {
@@ -79,15 +82,23 @@ size_t RNA::RNA_length() const { return RNA_size; }																			// RNA_len
 RNA& RNA::operator= (const RNA& RNA_2) {																					// Operator =
 	if (&RNA_2 == this) return *this;
 	RNA_size = RNA_2.RNA_size;
+	RNA_memory = RNA_2.RNA_memory;
 	delete[] RNA_arr;
 	if (RNA_size != 0) {
-		RNA_arr = new size_t[(RNA_size - 1) / (sizeof(size_t) * 4) + 1];
-		for (size_t i = 0; i < ((RNA_size - 1) / (sizeof(size_t) * 4) + 1); i++) {
+		RNA_arr = new size_t[RNA_memory];
+		size_t i = 0;
+		for (; i < ((RNA_size - 1) / (sizeof(size_t) * 4) + 1); i++) {
 			RNA_arr[i] = RNA_2.RNA_arr[i];
+		}
+		for (; i < RNA_memory; i++) {
+			RNA_arr[i] = 0;
 		}
 	}
 	else
+	{
 		RNA_arr = nullptr;
+		RNA_memory = 0;
+	}
 	return *this;
 }
 RNA::jab RNA::operator[] (size_t index) {																					// Operator []
@@ -229,7 +240,10 @@ void RNA::RNA_trim(size_t last_index) {																						// RNA_trim
 			}
 		}
 		else
+		{
 			RNA_arr = nullptr;
+			RNA_memory = 0;
+		}
 	}
 }
 RNA RNA::RNA_split(size_t last_index) const {																				// RNA_split
